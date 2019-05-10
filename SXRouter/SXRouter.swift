@@ -16,20 +16,13 @@ class SXRouter {
     
     private var appUrlSchemes: [String] {
         var urlSchemes:[String] = []
-        
         guard let infoDictionary = Bundle.main.infoDictionary
-            , let types = infoDictionary["CFBundleURLTypes"] as? [Any] else {
+            , let schemes = infoDictionary["LSApplicationQueriesSchemes"] as? [String] else {
                 return urlSchemes
         }
         
-        for type in types {
-            guard let schemes = type as? [String: Any] else {
-                return urlSchemes
-            }
-            let schemeArr = schemes["CFBundleURLSchemes"] as? [String]
-            if let scheme = schemeArr?.first! {
-                urlSchemes.append(scheme)
-            }
+        for scheme in schemes {
+            urlSchemes.append(scheme)
         }
         return urlSchemes
     }
