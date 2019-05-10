@@ -8,6 +8,14 @@
 
 import UIKit
 
+enum SXRouterType {
+    case none
+    case viewController
+    case closure
+}
+
+typealias routerClosure = ([String:Any]) -> Any
+
 class SXRouter {
     
     private static let shared = SXRouter()
@@ -93,20 +101,22 @@ class SXRouter {
             }
         }
         
-        guard let cla = subRoutes["_"] else {
+        guard let result = subRoutes["_"] else {
             return params
         }
         
-        if cla is UIViewController.Type {
+        if result is UIViewController.Type {
             params["controller_class"] = subRoutes["_"]
+        } else {
+            params["closure"] = subRoutes["_"]
         }
         
         return params
     }
     
-    class func map(route: String, vcClass: UIViewController.Type) {
+    private func map(route: String, value: Any) {
         let components = SXRouter.shared.pathComponents(from: route)
-        var reversedRoute:[String:Any] = ["_": vcClass]
+        var reversedRoute:[String:Any] = ["_": value]
         for (index, component) in components.enumerated().reversed() {
             let temp = reversedRoute
             reversedRoute = [:]
@@ -118,7 +128,16 @@ class SXRouter {
         }
     }
     
-    class func match(route: String) -> UIViewController? {
+    class func map(route: String, vcClass: UIViewController.Type) {
+        SXRouter.shared.map(route: route, value: vcClass)
+    }
+    
+    class func map(route: String, closure: @escaping routerClosure) {
+        SXRouter.shared.map(route: route, value: closure)
+    }
+    
+    
+    class func matchToVC(route: String) -> UIViewController? {
         let params = SXRouter.shared.params(in: route)
         guard let ViewControllerClass = params["controller_class"] as? UIViewController.Type else {
             return nil
@@ -126,6 +145,14 @@ class SXRouter {
         let vc = ViewControllerClass.init()
         vc.params = params
         return vc
+    }
+    
+    class func matchToClosure(route: String) -> routerClosure? {
+        let params = SXRouter.shared.params(in: route)
+        guard let closure = params["closure"] as? routerClosure else {
+            return nil
+        }
+        return closure
     }
 }
 

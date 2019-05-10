@@ -25,9 +25,14 @@ class ViewController: UIViewController {
     }
     
     @objc func presents() {
-        guard let vc = SXRouter.match(route: "user/123?tab=1&name=香辣虾") else { return }
-        print(vc.params)
-        present(vc, animated: true, completion: nil)
+        guard let closure = SXRouter.matchToClosure(route: "1111") else {
+            return
+        }
+        let result = closure(["1": "2"])
+        print(result)
+//        guard let vc = SXRouter.matchToVC(route: "user/123?tab=1&name=香辣虾") else { return }
+//        print(vc.params)
+//        present(vc, animated: true, completion: nil)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
