@@ -40,15 +40,14 @@ class SXRouter {
         return components
     }
     
-    private func filterAppUrlScheme(_ string: String) -> String {
-        // filter out the app URL compontents.
+    private func filterAppUrlScheme(_ route: String) -> String {
         for urlScheme in appUrlSchemes {
-            if string.hasPrefix("\(urlScheme):") {
-                let index = string.index(string.startIndex, offsetBy: (urlScheme.count + 2))
-                return String(string[index..<string.endIndex])
+            if route.hasPrefix(urlScheme + ":") {
+                let index = route.index(route.startIndex, offsetBy: (urlScheme.count + 2))
+                return String(route[index..<route.endIndex])
             }
         }
-        return string
+        return route
     }
     
     private func params(in route: String) -> [String: Any] {
