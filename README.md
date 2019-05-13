@@ -28,7 +28,7 @@ SXRouter.matchToVC(route: "/user/1/?tabIndex=3")
 
 ### One More Thing
 
-If your app has defined some URL schemes, HHRouter will know.
+If your app has defined some URL schemes, SXRouter will know.
 
 ```swift
 SXRouter.matchToVC(route: "sxrouter://user/1/")
