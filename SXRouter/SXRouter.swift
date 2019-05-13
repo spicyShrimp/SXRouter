@@ -14,7 +14,7 @@ enum SXRouterType {
     case closure
 }
 
-typealias routerClosure = ([String:Any]) -> Any
+typealias SXRouterClosure = ([String:Any]) -> Any
 
 class SXRouter {
     
@@ -132,10 +132,20 @@ class SXRouter {
         SXRouter.shared.map(route: route, value: vcClass)
     }
     
-    class func map(route: String, closure: @escaping routerClosure) {
+    class func map(route: String, closure: @escaping SXRouterClosure) {
         SXRouter.shared.map(route: route, value: closure)
     }
     
+    class func canRoute(_ route: String) -> SXRouterType {
+        let params = SXRouter.shared.params(in: route)
+        if params["controller_class"] != nil {
+            return .viewController
+        }
+        if params["closure"] != nil {
+            return .closure
+        }
+        return .none
+    }
     
     class func matchToVC(route: String) -> UIViewController? {
         let params = SXRouter.shared.params(in: route)
@@ -147,12 +157,24 @@ class SXRouter {
         return vc
     }
     
-    class func matchToClosure(route: String) -> routerClosure? {
+    class func matchToClosure(route: String) -> SXRouterClosure? {
         let params = SXRouter.shared.params(in: route)
-        guard let closure = params["closure"] as? routerClosure else {
+        guard let closure = params["closure"] as? SXRouterClosure else {
             return nil
         }
-        return closure
+        let returnClosure:SXRouterClosure = { aParams -> Any in
+            let newParams:[String:Any] = params.merging(aParams){ (_, new) in new }
+            return closure(newParams)
+        }
+        return returnClosure
+    }
+    
+    class func callClosure(_ route: String) -> Any? {
+        let params = SXRouter.shared.params(in: route)
+        guard let closure = params["closure"] as? SXRouterClosure else {
+            return nil
+        }
+        return closure(params)
     }
 }
 
